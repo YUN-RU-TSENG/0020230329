@@ -11,6 +11,10 @@
         "lint": "eslint \"src/**/*.{js,jsx}\"",
         "lint:fix": "eslint \"src/**/*.{js,jsx}\" --fix"
     },
+    "engines": {
+        "node": "18.5.0",
+        "npm": "8.12.1"
+    },
     "dependencies": {
         "react": "^18.2.0",
         "react-dom": "^18.2.0"
