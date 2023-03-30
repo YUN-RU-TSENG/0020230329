@@ -26,29 +26,48 @@ const tasksSlice = createSlice({
     name: "tasks",
     initialState: {
         tasks: [],
-        status: "idle",
+        isLoading: false,
         error: null,
+        isAddedTaskSuccess: false,
+        errorOfAddTask: null,
     },
-    reducers: {},
+    reducers: {
+        setAddedTaskSuccess(state, action) {
+            state.isAddedTaskSuccess = action.payload
+        },
+        setErrorOfAddTask(state, action) {
+            state.errorOfAddTask = action.payload
+        },
+    },
     extraReducers: (builder) => {
         builder
             // 當 fetchTasks action 開始時，將狀態設置為 loading
             .addCase(fetchTasks.pending, (state) => {
-                state.status = "loading"
+                state.isLoading = true
             })
             // 當 fetchTasks action 完成，將獲取到的 task 列表賦值給 state，並將狀態設置為 succeeded
             .addCase(fetchTasks.fulfilled, (state, action) => {
-                state.status = "succeeded"
+                state.isLoading = false
                 state.tasks = action.payload.items
             })
             // 當 fetchTasks action 失敗時，將錯誤信息賦值給 state，並將狀態設置為 failed
             .addCase(fetchTasks.rejected, (state, action) => {
-                state.status = "failed"
+                state.isLoading = false
                 state.error = action.error.message
+            })
+            .addCase(addTask.pending, (state) => {
+                state.isLoading = true
+                state.errorOfAddTask = null
             })
             // 當 addTask action 完成時，將新增的 task 加入到 state 中
             .addCase(addTask.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isAddedTaskSuccess = true
                 state.tasks.push(...action.payload.items)
+            })
+            .addCase(addTask.rejected, (state, action) => {
+                state.isLoading = false
+                state.errorOfAddTask = action.error.message
             })
             // 當 deleteTask action 完成時，將被刪除的 task 從 state 中移除
             .addCase(deleteTask.fulfilled, (state, action) => {
@@ -67,4 +86,7 @@ const tasksSlice = createSlice({
             })
     },
 })
+
 export default tasksSlice.reducer
+
+export const { setAddedTaskSuccess, setErrorOfAddTask } = tasksSlice.actions
