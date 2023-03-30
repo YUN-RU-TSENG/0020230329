@@ -1,7 +1,4 @@
-import AppBar from "@mui/material/AppBar"
-import Toolbar from "@mui/material/Toolbar"
-import Container from "@mui/material/Container"
-import Typography from "@mui/material/Typography"
+import { Typography, AppBar, Toolbar, Container } from "@mui/material"
 
 function NotFound() {
     return (

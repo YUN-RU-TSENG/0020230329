@@ -1,19 +1,17 @@
-import AppBar from "@mui/material/AppBar"
-
-import Breadcrumbs from "@mui/material/Breadcrumbs"
-import Link from "@mui/material/Link"
-import Box from "@mui/material/Box"
-import Toolbar from "@mui/material/Toolbar"
-
-import Container from "@mui/material/Container"
-import Typography from "@mui/material/Typography"
-import Button from "@mui/material/Button"
-
-import FormGroup from "@mui/material/FormGroup"
-import FormControlLabel from "@mui/material/FormControlLabel"
-import Checkbox from "@mui/material/Checkbox"
-
-import TextField from "@mui/material/TextField"
+import {
+    Breadcrumbs,
+    Link,
+    Box,
+    Toolbar,
+    Container,
+    Typography,
+    Button,
+    FormGroup,
+    FormControlLabel,
+    Checkbox,
+    TextField,
+    AppBar,
+} from "@mui/material"
 
 function EditTask() {
     function handleClick(event) {
