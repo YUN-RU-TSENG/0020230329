@@ -1,29 +1,25 @@
-import { Box, Typography, Link, Stack } from "@mui/material"
-import { blueGrey } from "@mui/material/colors"
+import AppBar from "@mui/material/AppBar"
+import Toolbar from "@mui/material/Toolbar"
+import Container from "@mui/material/Container"
+import Typography from "@mui/material/Typography"
 
 function NotFound() {
     return (
-        <Box>
-            <Stack
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-                spacing={0}
-                sx={{ minHeight: "100vh" }}
+        <>
+            <AppBar
+                sx={{ paddingX: "24px", marginBottom: "24px" }}
+                position="static"
             >
-                <Typography
-                    variant="h5"
-                    gutterBottom
-                    component="h2"
-                    sx={{
-                        fontWeight: 700,
-                        color: blueGrey[800],
-                    }}
-                >
-                    404，回首頁 <Link href="#">Link</Link>
-                </Typography>
-            </Stack>
-        </Box>
+                <Toolbar disableGutters>
+                    <Typography variant="h6" component="a" sx={{}}>
+                        Tasks APP
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Container maxWidth="lg">
+                <Typography color="text.primary">404</Typography>
+            </Container>
+        </>
     )
 }
 
