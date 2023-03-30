@@ -3,11 +3,7 @@ import { blueGrey } from "@mui/material/colors"
 
 function NotFound() {
     return (
-        <Box
-            sx={{
-                bgcolor: blueGrey[100],
-            }}
-        >
+        <Box>
             <Stack
                 direction="row"
                 justifyContent="center"

@@ -1,69 +1,87 @@
-import {
-    Container,
-    Box,
-    Typography,
-    Button,
-    FormControl,
-    FormHelperText,
-    Input,
-    InputLabel,
-    FormControlLabel,
-    FormGroup,
-    Checkbox,
-} from "@mui/material"
+import AppBar from "@mui/material/AppBar"
 
-import { blueGrey } from "@mui/material/colors"
+import Breadcrumbs from "@mui/material/Breadcrumbs"
+import Link from "@mui/material/Link"
+import Box from "@mui/material/Box"
+import Toolbar from "@mui/material/Toolbar"
+
+import Container from "@mui/material/Container"
+import Typography from "@mui/material/Typography"
+import Button from "@mui/material/Button"
+
+import FormGroup from "@mui/material/FormGroup"
+import FormControlLabel from "@mui/material/FormControlLabel"
+import Checkbox from "@mui/material/Checkbox"
+
+import TextField from "@mui/material/TextField"
 
 function CreateTask() {
+    function handleClick(event) {
+        event.preventDefault()
+        console.info("You clicked a breadcrumb.")
+    }
+
     return (
-        <Box
-            sx={{
-                bgcolor: blueGrey[100],
-            }}
-        >
-            <Container
-                maxWidth="lg"
-                sx={{
-                    paddingY: "12px",
-                    minHeight: "100vh",
-                }}
+        <>
+            <AppBar
+                sx={{ paddingX: "24px", marginBottom: "24px" }}
+                position="static"
             >
-                <Typography
-                    variant="h5"
-                    gutterBottom
-                    component="h2"
-                    sx={{
-                        fontWeight: 700,
-                        color: blueGrey[800],
-                    }}
-                >
-                    Task List
+                <Toolbar disableGutters>
+                    <Typography variant="h6" component="a" sx={{}}>
+                        Tasks APP
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Container maxWidth="lg">
+                <Box>
+                    <div role="presentation" onClick={handleClick}>
+                        <Breadcrumbs aria-label="breadcrumb">
+                            <Link underline="hover" color="inherit" href="/">
+                                MUI
+                            </Link>
+                            <Link
+                                underline="hover"
+                                color="inherit"
+                                href="/material-ui/getting-started/installation/"
+                            >
+                                Core
+                            </Link>
+                            <Typography color="text.primary">
+                                Breadcrumbs
+                            </Typography>
+                        </Breadcrumbs>
+                    </div>
+                </Box>
+                <Typography variant="h6" component="h2" gutterBottom>
+                    Tasks APP
                 </Typography>
                 <Typography
                     variant="subtitle2"
-                    sx={{
-                        color: blueGrey[700],
-                    }}
+                    component="p"
+                    gutterBottom
+                    sx={{}}
                 >
-                    You can add your tasks here, limit 500 tasks.
+                    Tasks APP
                 </Typography>
                 <FormGroup>
+                    <TextField
+                        id="outlined-basic"
+                        label="Outlined"
+                        variant="outlined"
+                        sx={{}}
+                    />
                     <FormControlLabel
                         control={<Checkbox defaultChecked />}
                         label="Label"
                     />
+                    <Button variant="contained" sx={{ marginBottom: "12px" }}>
+                        儲存
+                    </Button>
+                    <Button variant="outlined">取消</Button>
                 </FormGroup>
-                <FormControl>
-                    <InputLabel htmlFor="my-input">Email address</InputLabel>
-                    <Input id="my-input" aria-describedby="my-helper-text" />
-                    <FormHelperText id="my-helper-text">
-                        We&apos;ll never share your email.
-                    </FormHelperText>
-                </FormControl>
-                <Button>Submit</Button>
-                <Button>Cancel</Button>
             </Container>
-        </Box>
+        </>
     )
 }
 

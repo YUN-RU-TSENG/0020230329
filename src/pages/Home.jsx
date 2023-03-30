@@ -1,24 +1,25 @@
 import { useState } from "react"
+import AppBar from "@mui/material/AppBar"
 
-import {
-    Container,
-    Box,
-    Typography,
-    List,
-    ListItem,
-    IconButton,
-    ListItemAvatar,
-    Avatar,
-    ListItemText,
-    Fab,
-} from "@mui/material"
-import {
-    Delete,
-    FormatListBulleted,
-    EmojiEmotions,
-    Add,
-} from "@mui/icons-material"
-import { blueGrey } from "@mui/material/colors"
+import Box from "@mui/material/Box"
+import Toolbar from "@mui/material/Toolbar"
+import IconButton from "@mui/material/IconButton"
+import Typography from "@mui/material/Typography"
+
+import Divider from "@mui/material/Divider"
+import Container from "@mui/material/Container"
+
+import List from "@mui/material/List"
+import ListItem from "@mui/material/ListItem"
+import ListItemButton from "@mui/material/ListItemButton"
+import ListItemIcon from "@mui/material/ListItemIcon"
+import ListItemText from "@mui/material/ListItemText"
+import Checkbox from "@mui/material/Checkbox"
+import Fab from "@mui/material/Fab"
+
+import AddIcon from "@mui/icons-material/Add"
+import DeleteIcon from "@mui/icons-material/Delete"
+import ModeEditIcon from "@mui/icons-material/ModeEdit"
 
 // import { useSelector, useDispatch } from "react-redux"
 // import {
@@ -48,145 +49,104 @@ function Home() {
     //     dispatch(updateTask({ _uuid, completed, title }))
     // }
 
-    const [listItems] = useState([
-        {
-            _created: 1636112613.207888,
-            _data_type: "task",
-            _is_deleted: false,
-            _modified: 1636112613.207898,
-            _self_link:
-                "https://crudapi.co.uk/api/v1/task/c54ff081-f858-4e5b-8041-4c22f153c926",
-            _user: "baeb6fd4-f196-485f-9130-d5455ad16074",
-            _uuid: "c54ff081-f858-4e5b-8041-4c22f153c926",
-            completed: false,
-            title: "My first task",
-        },
-        {
-            _created: 1636112613.207888,
-            _data_type: "task",
-            _is_deleted: false,
-            _modified: 1636112613.207898,
-            _self_link:
-                "https://crudapi.co.uk/api/v1/task/c54ff081-f858-4e5b-8041-4c22f153c926",
-            _user: "baeb6fd4-f196-485f-9130-d5455ad16074",
-            _uuid: "c54ff081-f858-4e5b-8041-4c22f153c926",
-            completed: false,
-            title: "My first task",
-        },
-        {
-            _created: 1636112613.207888,
-            _data_type: "task",
-            _is_deleted: false,
-            _modified: 1636112613.207898,
-            _self_link:
-                "https://crudapi.co.uk/api/v1/task/c54ff081-f858-4e5b-8041-4c22f153c926",
-            _user: "baeb6fd4-f196-485f-9130-d5455ad16074",
-            _uuid: "c54ff081-f858-4e5b-8041-4c22f153c926",
-            completed: false,
-            title: "My first task",
-        },
-        {
-            _created: 1636112613.207888,
-            _data_type: "task",
-            _is_deleted: false,
-            _modified: 1636112613.207898,
-            _self_link:
-                "https://crudapi.co.uk/api/v1/task/c54ff081-f858-4e5b-8041-4c22f153c926",
-            _user: "baeb6fd4-f196-485f-9130-d5455ad16074",
-            _uuid: "c54ff081-f858-4e5b-8041-4c22f153c926",
-            completed: false,
-            title: "My first task",
-        },
-    ])
+    const [checked, setChecked] = useState([0])
+
+    const handleToggle = (value) => () => {
+        const currentIndex = checked.indexOf(value)
+        const newChecked = [...checked]
+
+        if (currentIndex === -1) {
+            newChecked.push(value)
+        } else {
+            newChecked.splice(currentIndex, 1)
+        }
+
+        setChecked(newChecked)
+    }
 
     return (
-        <Box
-            sx={{
-                bgcolor: blueGrey[100],
-            }}
-        >
-            <Container
-                maxWidth="lg"
-                sx={{
-                    paddingY: "12px",
-                    minHeight: "100vh",
-                }}
+        <>
+            <AppBar
+                sx={{ paddingX: "24px", marginBottom: "24px" }}
+                position="static"
             >
-                <Box sx={{ marginBottom: "24px" }}>
-                    <Typography
-                        variant="h5"
-                        gutterBottom
-                        component="h2"
-                        sx={{
-                            fontWeight: 700,
-                            color: blueGrey[800],
-                        }}
-                    >
-                        Task List
+                <Toolbar disableGutters>
+                    <Typography variant="h6" component="a" sx={{}}>
+                        Tasks APP
                     </Typography>
-                    <Typography
-                        variant="subtitle2"
-                        sx={{
-                            color: blueGrey[700],
-                        }}
-                    >
-                        You can add your tasks here, limit 500 tasks.
-                    </Typography>
-                </Box>
-                <Box>
-                    <List
-                        dense={true}
-                        sx={{
-                            borderRadius: "8px",
-                            bgcolor: blueGrey[200],
-                        }}
-                    >
-                        {listItems.length === 0 ? (
-                            <Box sx={{ textAlign: "center", padding: "12px" }}>
-                                <EmojiEmotions />{" "}
-                                <Typography
-                                    variant="subtitle2"
-                                    gutterBottom
-                                    sx={{
-                                        color: blueGrey[700],
-                                    }}
-                                >
-                                    There is empty. Try to add some tasks.
-                                </Typography>
-                            </Box>
-                        ) : (
-                            listItems.map((item) => (
+                </Toolbar>
+            </AppBar>
+            <Container maxWidth="lg">
+                <List
+                    sx={{
+                        width: "100%",
+                        bgcolor: "background.paper",
+                    }}
+                >
+                    {[0, 1, 2, 3].map((value) => {
+                        const labelId = `checkbox-list-label-${value}`
+
+                        return (
+                            <div key={value}>
                                 <ListItem
-                                    key={item._uuid}
                                     secondaryAction={
-                                        <IconButton
-                                            edge="end"
-                                            aria-label="delete"
-                                        >
-                                            <Delete
-                                                sx={{ color: blueGrey[700] }}
-                                            />
-                                        </IconButton>
+                                        <Box>
+                                            <IconButton
+                                                edge="end"
+                                                aria-label="comments"
+                                                sx={{ marginRight: "12px" }}
+                                            >
+                                                <ModeEditIcon />
+                                            </IconButton>
+                                            <IconButton
+                                                edge="end"
+                                                aria-label="comments"
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Box>
                                     }
+                                    disablePadding
                                 >
-                                    <ListItemAvatar>
-                                        <Avatar sx={{ bgcolor: blueGrey[400] }}>
-                                            <FormatListBulleted />
-                                        </Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText primary={item.title} />
+                                    <ListItemButton
+                                        role={undefined}
+                                        onClick={handleToggle(value)}
+                                        dense
+                                    >
+                                        <ListItemIcon>
+                                            <Checkbox
+                                                edge="start"
+                                                checked={
+                                                    checked.indexOf(value) !==
+                                                    -1
+                                                }
+                                                tabIndex={-1}
+                                                disableRipple
+                                                inputProps={{
+                                                    "aria-labelledby": labelId,
+                                                }}
+                                            />
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            id={labelId}
+                                            primary={`Line item ${value + 1}`}
+                                        />
+                                    </ListItemButton>
                                 </ListItem>
-                            ))
-                        )}
-                    </List>
-                </Box>
-                <Box sx={{ position: "fixed", right: "12px", bottom: "12px" }}>
-                    <Fab color="primary" aria-label="add">
-                        <Add />
-                    </Fab>
-                </Box>
+                                <Divider />
+                            </div>
+                        )
+                    })}
+                </List>
             </Container>
-        </Box>
+            <Fab
+                color="primary"
+                aria-label="add"
+                sx={{ position: "fixed", right: "24px", bottom: "24px" }}
+            >
+                <AddIcon />
+            </Fab>
+        </>
     )
 }
 
