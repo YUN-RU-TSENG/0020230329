@@ -44,7 +44,7 @@ function Home() {
     const [isModalShow, setIsModalShow] = useState(false)
     const [modalError, setModalError] = useState(null)
 
-    const handleClose = () => {
+    function handleClose() {
         setIsModalShow(false)
         setModalError(null)
     }

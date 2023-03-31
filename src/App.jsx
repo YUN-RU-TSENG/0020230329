@@ -5,10 +5,10 @@ import {
     Route,
 } from "react-router-dom"
 
-import Home from "./pages/Home"
-import EditTask from "./pages/EditTask"
-import CreateTask from "./pages/CreateTask"
-import NotFound from "./pages/NotFound"
+import Home from "@/pages/Home"
+import EditTask from "@/pages/EditTask"
+import CreateTask from "@/pages/CreateTask"
+import NotFound from "@/pages/NotFound"
 
 import { Toolbar, Typography, AppBar, Container } from "@mui/material"
 
@@ -28,7 +28,7 @@ function App() {
         <div>
             <AppBar sx={{ paddingX: "24px" }} position="fixed">
                 <Toolbar disableGutters>
-                    <Typography variant="h6" component="a" sx={{}}>
+                    <Typography variant="h6" component="h2">
                         Tasks APP
                     </Typography>
                 </Toolbar>

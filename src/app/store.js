@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit"
-import { taskAPI } from "./services/task"
+import { taskAPI } from "@/app/services/task"
 
 export const store = configureStore({
     reducer: {

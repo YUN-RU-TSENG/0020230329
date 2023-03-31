@@ -23,37 +23,30 @@ function EditTask() {
 
     const { data: tasksData, isLoading, isSuccess } = useGetTasksQuery()
 
-    const [
-        updateTask,
-        { isLoading: isUpdateTasksLoading, isSuccess: isUpdateSuccess },
-    ] = useUpdateTaskMutation()
+    const [updateTask, { isLoading: isUpdateTasksLoading }] =
+        useUpdateTaskMutation()
 
     const [editedTask, setEditedTask] = useState({
         title: "",
         complete: false,
     })
-
     const [editedTaskTitleError, setEditedTaskTitleError] = useState(null)
     const [isModalShow, setIsModalShow] = useState(false)
     const [modalError, setModalError] = useState(null)
 
-    function handleClose() {
-        setIsModalShow(false)
-        setModalError(null)
-    }
-
+    // 刷新頁面後，重新依據 id 取得 task 值，設置表單 edit task 初始值
     useEffect(() => {
         if (!isSuccess) return
         setEditedTask({
             title: getTaskById(tasksData, params.id).title,
             complete: getTaskById(tasksData, params.id).complete,
         })
-    }, [tasksData])
+    }, [tasksData, isSuccess])
 
-    useEffect(() => {
-        if (!isUpdateSuccess) return
-        navigate("/")
-    }, [isUpdateSuccess])
+    function handleClose() {
+        setIsModalShow(false)
+        setModalError(null)
+    }
 
     async function updateTaskItem() {
         if (!editedTask.title) return setEditedTaskTitleError("此欄位不能為空")
@@ -63,6 +56,7 @@ function EditTask() {
                 ...getTaskById(tasksData, params.id),
                 ...editedTask,
             }).unwrap()
+            navigate("/")
         } catch (error) {
             setIsModalShow(true)
             setModalError(error.status + " " + error.data.error)
@@ -74,123 +68,116 @@ function EditTask() {
     }
 
     return (
-        <>
-            <Box>
-                {/* Error Modal */}
-                <Modal
-                    open={isModalShow}
-                    onClose={handleClose}
-                    aria-labelledby="modal-modal-title"
-                    aria-describedby="modal-modal-description"
+        <Box>
+            {/* Error Modal */}
+            <Modal
+                open={isModalShow}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box
+                    sx={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        width: 400,
+                        bgcolor: "#fff",
+                        boxShadow: 4,
+                        p: 4,
+                    }}
                 >
-                    <Box
-                        sx={{
-                            position: "absolute",
-                            top: "50%",
-                            left: "50%",
-                            transform: "translate(-50%, -50%)",
-                            width: 400,
-                            bgcolor: "#fff",
-                            boxShadow: 4,
-                            p: 4,
-                        }}
-                    >
-                        <Typography
-                            id="modal-modal-title"
-                            variant="h6"
-                            component="h2"
-                        >
-                            修改 Task 失敗
-                        </Typography>
-                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            {modalError}
-                        </Typography>
-                    </Box>
-                </Modal>
-                <Box>
-                    <Breadcrumbs aria-label="breadcrumb">
-                        <Link underline="hover" href="/">
-                            Home
-                        </Link>
-                        <Typography>Edit task</Typography>
-                    </Breadcrumbs>
-
-                    <Typography variant="h6" component="h2" gutterBottom>
-                        編輯 Edit
-                    </Typography>
                     <Typography
-                        variant="subtitle2"
-                        component="p"
-                        gutterBottom
-                        sx={{}}
+                        id="modal-modal-title"
+                        variant="h6"
+                        component="h2"
                     >
-                        修改你的 Task 吧！
+                        修改 Task 失敗
                     </Typography>
-                    <FormGroup>
-                        <TextField
-                            id="outlined-basic"
-                            label="Outlined"
-                            variant="outlined"
-                            value={editedTask.title}
-                            error={!!editedTaskTitleError}
-                            helperText={editedTaskTitleError}
-                            onChange={(e) => {
-                                setEditedTask((prevState) => ({
-                                    ...prevState,
-                                    title: e.target.value,
-                                }))
-                            }}
-                            disabled={isUpdateTasksLoading || isLoading}
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    checked={editedTask.complete}
-                                    onChange={(e) => {
-                                        setEditedTask((prevState) => ({
-                                            ...prevState,
-                                            complete: e.target.checked,
-                                        }))
-                                    }}
-                                    disabled={isUpdateTasksLoading || isLoading}
-                                />
-                            }
-                            label="已完成"
-                        />
-                        <Button
-                            variant="contained"
-                            sx={{ marginBottom: "12px" }}
-                            onClick={updateTaskItem}
-                            disabled={isUpdateTasksLoading || isLoading}
-                        >
-                            修改任務
-                            {(isLoading || isUpdateTasksLoading) && (
-                                <CircularProgress
-                                    size={24}
-                                    sx={{
-                                        color: "primary",
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        bottom: 0,
-                                        right: 0,
-                                        margin: "auto",
-                                        zIndex: 1,
-                                    }}
-                                />
-                            )}
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            onClick={() => navigate("/")}
-                            disabled={isUpdateTasksLoading || isLoading}
-                        >
-                            取消
-                        </Button>
-                    </FormGroup>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        {modalError}
+                    </Typography>
                 </Box>
+            </Modal>
+            <Box>
+                <Breadcrumbs aria-label="breadcrumb">
+                    <Link underline="hover" href="/">
+                        Home
+                    </Link>
+                    <Typography>Edit task</Typography>
+                </Breadcrumbs>
+
+                <Typography variant="h6" component="h2" gutterBottom>
+                    編輯 Edit
+                </Typography>
+                <Typography variant="subtitle2" component="p" gutterBottom>
+                    修改你的 Task 吧！
+                </Typography>
+                <FormGroup>
+                    <TextField
+                        id="outlined-basic"
+                        label="Outlined"
+                        variant="outlined"
+                        value={editedTask.title}
+                        error={!!editedTaskTitleError}
+                        helperText={editedTaskTitleError}
+                        onChange={(e) => {
+                            setEditedTask((prevState) => ({
+                                ...prevState,
+                                title: e.target.value,
+                            }))
+                        }}
+                        disabled={isUpdateTasksLoading || isLoading}
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={editedTask.complete}
+                                onChange={(e) => {
+                                    setEditedTask((prevState) => ({
+                                        ...prevState,
+                                        complete: e.target.checked,
+                                    }))
+                                }}
+                                disabled={isUpdateTasksLoading || isLoading}
+                            />
+                        }
+                        label="已完成"
+                    />
+                    <Button
+                        variant="contained"
+                        sx={{ marginBottom: "12px" }}
+                        onClick={updateTaskItem}
+                        disabled={isUpdateTasksLoading || isLoading}
+                    >
+                        修改任務
+                        {(isLoading || isUpdateTasksLoading) && (
+                            <CircularProgress
+                                size={24}
+                                sx={{
+                                    color: "primary",
+                                    position: "absolute",
+                                    top: 0,
+                                    left: 0,
+                                    bottom: 0,
+                                    right: 0,
+                                    margin: "auto",
+                                    zIndex: 1,
+                                }}
+                            />
+                        )}
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        onClick={() => navigate("/")}
+                        disabled={isUpdateTasksLoading || isLoading}
+                    >
+                        取消
+                    </Button>
+                </FormGroup>
             </Box>
-        </>
+        </Box>
     )
 }
 

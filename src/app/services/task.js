@@ -6,6 +6,11 @@ export const taskAPI = createApi({
         baseUrl: import.meta.env.DEV
             ? "/api"
             : import.meta.env.VITE_BASE_API_URL,
+        headers: {
+            Authorization: `Bearer ${
+                import.meta.env.VITE_BASE_API_URL_AUTH_TOKEN
+            }`,
+        },
     }),
     tagTypes: ["Tasks"],
     endpoints: (builder) => ({
@@ -13,26 +18,16 @@ export const taskAPI = createApi({
             query: () => {
                 return {
                     url: "/task",
-                    headers: {
-                        Authorization: `Bearer ${
-                            import.meta.env.VITE_BASE_API_URL_AUTH_TOKEN
-                        }`,
-                    },
                 }
             },
             providesTags: ["Tasks"],
         }),
         addTask: builder.mutation({
-            query(task) {
+            query: (task) => {
                 return {
                     url: `/task`,
                     method: "POST",
                     body: task,
-                    headers: {
-                        Authorization: `Bearer ${
-                            import.meta.env.VITE_BASE_API_URL_AUTH_TOKEN
-                        }`,
-                    },
                 }
             },
             invalidatesTags: ["Tasks"],
@@ -43,25 +38,15 @@ export const taskAPI = createApi({
                     url: `/task/${task._uuid}`,
                     method: "PUT",
                     body: task,
-                    headers: {
-                        Authorization: `Bearer ${
-                            import.meta.env.VITE_BASE_API_URL_AUTH_TOKEN
-                        }`,
-                    },
                 }
             },
             invalidatesTags: ["Tasks"],
         }),
         deleteTask: builder.mutation({
-            query(taskId) {
+            query: (taskId) => {
                 return {
                     url: `/task/${taskId}`,
                     method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${
-                            import.meta.env.VITE_BASE_API_URL_AUTH_TOKEN
-                        }`,
-                    },
                 }
             },
             invalidatesTags: ["Tasks"],
