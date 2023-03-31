@@ -50,7 +50,7 @@ function CreateTask() {
     function addTaskItem(newTask) {
         if (!newTask.title) return setNewTaskTitleError("此欄位不能為空")
 
-        dispatch(addTask())
+        dispatch(addTask({ ...newTask, complete: false }))
     }
 
     return (

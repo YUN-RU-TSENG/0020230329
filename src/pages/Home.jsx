@@ -2,12 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 
-import {
-    fetchTasks,
-    // addTask,
-    // deleteTask,
-    // updateTask,
-} from "../features/task/taskSlice"
+import { fetchTasks, deleteTask } from "../features/task/taskSlice"
 
 import {
     Box,
@@ -153,12 +148,22 @@ function Home() {
                                                 edge="end"
                                                 aria-label="comments"
                                                 sx={{ marginRight: "12px" }}
+                                                onClick={() =>
+                                                    navigate(
+                                                        `/edit-task/${task._uuid}`
+                                                    )
+                                                }
                                             >
                                                 <ModeEditIcon />
                                             </IconButton>
                                             <IconButton
                                                 edge="end"
                                                 aria-label="comments"
+                                                onClick={() =>
+                                                    dispatch(
+                                                        deleteTask(task._uuid)
+                                                    )
+                                                }
                                             >
                                                 <DeleteIcon />
                                             </IconButton>
@@ -174,9 +179,8 @@ function Home() {
                                         <ListItemIcon>
                                             <Checkbox
                                                 edge="start"
-                                                checked={
-                                                    checked.indexOf(task) !== -1
-                                                }
+                                                checked={!!task.complete}
+                                                onChange={() => {}}
                                                 tabIndex={-1}
                                                 disableRipple
                                                 inputProps={{
@@ -186,7 +190,7 @@ function Home() {
                                         </ListItemIcon>
                                         <ListItemText
                                             id={labelId}
-                                            primary={`Line item ${task._uuid}`}
+                                            primary={task.title}
                                         />
                                     </ListItemButton>
                                 </ListItem>
