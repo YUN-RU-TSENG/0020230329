@@ -1,81 +1,85 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
 
-import {
-    updateTask,
-    setEditedTaskSuccess,
-    setErrorOfEditedTask,
-    getTaskById,
-} from "../features/task/taskSlice"
+import { useUpdateTaskMutation, useGetTasksQuery } from "@/app/services/task"
 
 import {
     Breadcrumbs,
     Link,
     Box,
-    Toolbar,
-    Container,
     Typography,
     Button,
     FormGroup,
     FormControlLabel,
     Checkbox,
     TextField,
-    AppBar,
     CircularProgress,
     Modal,
 } from "@mui/material"
 
 function EditTask() {
     const navigate = useNavigate()
-    const dispatch = useDispatch()
     const params = useParams()
 
-    const {
-        isLoading: isTaskLoading,
-        isEditedTaskSuccess,
-        errorOfEditedTask,
-    } = useSelector((state) => state.task)
-    const initEditTask = useSelector(getTaskById(params.id))
+    const { data: tasksData, isLoading, isSuccess } = useGetTasksQuery()
+
+    const [
+        updateTask,
+        { isLoading: isUpdateTasksLoading, isSuccess: isUpdateSuccess },
+    ] = useUpdateTaskMutation()
 
     const [editedTask, setEditedTask] = useState({
-        title: initEditTask.title,
-        complete: initEditTask.complete,
+        title: "",
+        complete: false,
     })
+
     const [editedTaskTitleError, setEditedTaskTitleError] = useState(null)
+    const [isModalShow, setIsModalShow] = useState(false)
+    const [modalError, setModalError] = useState(null)
+
+    function handleClose() {
+        setIsModalShow(false)
+        setModalError(null)
+    }
 
     useEffect(() => {
-        if (!isEditedTaskSuccess) return
+        if (!isSuccess) return
+        setEditedTask({
+            title: getTaskById(tasksData, params.id).title,
+            complete: getTaskById(tasksData, params.id).complete,
+        })
+    }, [tasksData])
 
-        dispatch(setEditedTaskSuccess(false))
+    useEffect(() => {
+        if (!isUpdateSuccess) return
         navigate("/")
-    }, [isEditedTaskSuccess, dispatch])
+    }, [isUpdateSuccess])
 
-    function updateTaskItem() {
+    async function updateTaskItem() {
         if (!editedTask.title) return setEditedTaskTitleError("此欄位不能為空")
 
-        dispatch(updateTask({ ...initEditTask, ...editedTask }))
+        try {
+            await updateTask({
+                ...getTaskById(tasksData, params.id),
+                ...editedTask,
+            }).unwrap()
+        } catch (error) {
+            setIsModalShow(true)
+            setModalError(error.status + " " + error.data.error)
+        }
+    }
+
+    function getTaskById(tasks, taskId) {
+        return tasks?.items.filter((task) => task._uuid === taskId)?.[0]
     }
 
     return (
         <>
-            <AppBar
-                sx={{ paddingX: "24px", marginBottom: "24px" }}
-                position="static"
-            >
-                <Toolbar disableGutters>
-                    <Typography variant="h6" component="a" sx={{}}>
-                        Tasks APP
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-            <Container maxWidth="lg">
+            <Box>
                 {/* Error Modal */}
                 <Modal
-                    open={!!errorOfEditedTask}
-                    onClose={() => {
-                        dispatch(setErrorOfEditedTask(null))
-                    }}
+                    open={isModalShow}
+                    onClose={handleClose}
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
@@ -87,7 +91,7 @@ function EditTask() {
                             transform: "translate(-50%, -50%)",
                             width: 400,
                             bgcolor: "#fff",
-                            boxShadow: 24,
+                            boxShadow: 4,
                             p: 4,
                         }}
                     >
@@ -99,7 +103,7 @@ function EditTask() {
                             修改 Task 失敗
                         </Typography>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            {errorOfEditedTask}
+                            {modalError}
                         </Typography>
                     </Box>
                 </Modal>
@@ -136,6 +140,7 @@ function EditTask() {
                                     title: e.target.value,
                                 }))
                             }}
+                            disabled={isUpdateTasksLoading || isLoading}
                         />
                         <FormControlLabel
                             control={
@@ -147,6 +152,7 @@ function EditTask() {
                                             complete: e.target.checked,
                                         }))
                                     }}
+                                    disabled={isUpdateTasksLoading || isLoading}
                                 />
                             }
                             label="已完成"
@@ -155,10 +161,10 @@ function EditTask() {
                             variant="contained"
                             sx={{ marginBottom: "12px" }}
                             onClick={updateTaskItem}
-                            disabled={isTaskLoading}
+                            disabled={isUpdateTasksLoading || isLoading}
                         >
                             修改任務
-                            {isTaskLoading && (
+                            {(isLoading || isUpdateTasksLoading) && (
                                 <CircularProgress
                                     size={24}
                                     sx={{
@@ -177,13 +183,13 @@ function EditTask() {
                         <Button
                             variant="outlined"
                             onClick={() => navigate("/")}
-                            disabled={isTaskLoading}
+                            disabled={isUpdateTasksLoading || isLoading}
                         >
                             取消
                         </Button>
                     </FormGroup>
                 </Box>
-            </Container>
+            </Box>
         </>
     )
 }

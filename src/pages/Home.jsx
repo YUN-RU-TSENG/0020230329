@@ -1,17 +1,15 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { useSelector, useDispatch } from "react-redux"
 
-import { fetchTasks, deleteTask } from "../features/task/taskSlice"
+import {
+    useGetTasksQuery,
+    useDeleteTaskMutation,
+    useUpdateTaskMutation,
+} from "@/app/services/task"
 
 import {
     Box,
-    Toolbar,
-    Container,
-    Modal,
-    Typography,
     Checkbox,
-    AppBar,
     IconButton,
     Divider,
     List,
@@ -22,6 +20,8 @@ import {
     Fab,
     CircularProgress,
     Stack,
+    Modal,
+    Typography,
 } from "@mui/material"
 
 import {
@@ -33,67 +33,55 @@ import {
 function Home() {
     const navigate = useNavigate()
 
-    const dispatch = useDispatch()
-    const taskStore = useSelector((state) => state.task)
+    const { data: tasksData, isLoading: isGetTasksLoading } = useGetTasksQuery()
 
-    useEffect(() => {
-        dispatch(fetchTasks())
-    }, [dispatch])
+    const [updateTask, { isLoading: isUpdateTasksLoading }] =
+        useUpdateTaskMutation()
 
-    // function getTaskItem(newTask) {
-    //     dispatch(fetchTasks(newTask))
-    // }
+    const [deleteTask, { isLoading: isDeleteTasksLoading }] =
+        useDeleteTaskMutation()
 
-    // function addTaskItem(newTask) {
-    //     dispatch(addTask(newTask))
-    // }
-
-    // function deleteTaskItem(id) {
-    //     dispatch(deleteTask(id))
-    // }
-
-    // function updateTaskItem({ _uuid, completed, title }) {
-    //     dispatch(updateTask({ _uuid, completed, title }))
-    // }
-
-    const [checked, setChecked] = useState([0])
-    const [open, setOpen] = useState(true)
+    const [isModalShow, setIsModalShow] = useState(false)
+    const [modalError, setModalError] = useState(null)
 
     const handleClose = () => {
-        setOpen(false)
+        setIsModalShow(false)
+        setModalError(null)
     }
 
-    const handleToggle = (value) => () => {
-        const currentIndex = checked.indexOf(value)
-        const newChecked = [...checked]
-
-        if (currentIndex === -1) {
-            newChecked.push(value)
-        } else {
-            newChecked.splice(currentIndex, 1)
+    async function deleteTaskItem(id) {
+        try {
+            await deleteTask(id).unwrap()
+        } catch (error) {
+            setIsModalShow(true)
+            setModalError(error.status + " " + error.data.error)
         }
+    }
 
-        setChecked(newChecked)
+    async function updateTaskItem(taskId, complete) {
+        try {
+            await updateTask({
+                _uuid: taskId,
+                complete,
+            }).unwrap()
+        } catch (error) {
+            setIsModalShow(true)
+            setModalError(error.status + " " + error.data.error)
+        }
     }
 
     return (
         <>
-            <AppBar sx={{ paddingX: "24px" }} position="fixed">
-                <Toolbar disableGutters>
-                    <Typography variant="h6" component="a" sx={{}}>
-                        Tasks APP
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-
-            <Container maxWidth="lg" sx={{ paddingTop: "76px" }}>
+            <Box>
                 <List
                     sx={{
                         width: "100%",
                         bgcolor: "background.paper",
                     }}
                 >
-                    {taskStore.isLoading && (
+                    {(isDeleteTasksLoading ||
+                        isGetTasksLoading ||
+                        isUpdateTasksLoading) && (
                         <Stack
                             direction="row"
                             justifyContent="center"
@@ -112,33 +100,41 @@ function Home() {
                             <CircularProgress />
                         </Stack>
                     )}
-                    {taskStore.error && (
-                        <Modal
-                            open={open}
-                            onClose={handleClose}
-                            aria-labelledby="modal-modal-title"
-                            aria-describedby="modal-modal-description"
+                    <Modal
+                        open={isModalShow}
+                        onClose={handleClose}
+                        aria-labelledby="modal-modal-title"
+                        aria-describedby="modal-modal-description"
+                    >
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                                width: 400,
+                                bgcolor: "#fff",
+                                boxShadow: 4,
+                                p: 4,
+                            }}
                         >
-                            <Box>
-                                <Typography
-                                    id="modal-modal-title"
-                                    variant="h6"
-                                    component="h2"
-                                >
-                                    異常錯誤
-                                </Typography>
-                                <Typography
-                                    id="modal-modal-description"
-                                    sx={{ mt: 2 }}
-                                >
-                                    {taskStore.error}
-                                </Typography>
-                            </Box>
-                        </Modal>
-                    )}
-                    {taskStore.tasks.map((task) => {
+                            <Typography
+                                id="modal-modal-title"
+                                variant="h6"
+                                component="h2"
+                            >
+                                刪除失敗
+                            </Typography>
+                            <Typography
+                                id="modal-modal-description"
+                                sx={{ mt: 2 }}
+                            >
+                                {modalError}
+                            </Typography>
+                        </Box>
+                    </Modal>
+                    {tasksData?.items.map((task) => {
                         const labelId = `checkbox-list-label-${task._uuid}`
-
                         return (
                             <div key={task._uuid}>
                                 <ListItem
@@ -160,9 +156,7 @@ function Home() {
                                                 edge="end"
                                                 aria-label="comments"
                                                 onClick={() =>
-                                                    dispatch(
-                                                        deleteTask(task._uuid)
-                                                    )
+                                                    deleteTaskItem(task._uuid)
                                                 }
                                             >
                                                 <DeleteIcon />
@@ -171,16 +165,17 @@ function Home() {
                                     }
                                     disablePadding
                                 >
-                                    <ListItemButton
-                                        role={undefined}
-                                        onClick={handleToggle(task)}
-                                        dense
-                                    >
+                                    <ListItemButton dense>
                                         <ListItemIcon>
                                             <Checkbox
                                                 edge="start"
                                                 checked={!!task.complete}
-                                                onChange={() => {}}
+                                                onChange={(e) => {
+                                                    updateTaskItem(
+                                                        task._uuid,
+                                                        e.target.checked
+                                                    )
+                                                }}
                                                 tabIndex={-1}
                                                 disableRipple
                                                 inputProps={{
@@ -199,7 +194,7 @@ function Home() {
                         )
                     })}
                 </List>
-            </Container>
+            </Box>
             <Fab
                 color="primary"
                 aria-label="add"

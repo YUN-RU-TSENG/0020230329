@@ -10,6 +10,8 @@ import EditTask from "./pages/EditTask"
 import CreateTask from "./pages/CreateTask"
 import NotFound from "./pages/NotFound"
 
+import { Toolbar, Typography, AppBar, Container } from "@mui/material"
+
 const router = createBrowserRouter(
     createRoutesFromElements(
         <Route path="/">
@@ -24,7 +26,16 @@ const router = createBrowserRouter(
 function App() {
     return (
         <div>
-            <RouterProvider router={router} />
+            <AppBar sx={{ paddingX: "24px" }} position="fixed">
+                <Toolbar disableGutters>
+                    <Typography variant="h6" component="a" sx={{}}>
+                        Tasks APP
+                    </Typography>
+                </Toolbar>
+            </AppBar>
+            <Container maxWidth="lg" sx={{ paddingTop: "76px" }}>
+                <RouterProvider router={router} />
+            </Container>
         </div>
     )
 }

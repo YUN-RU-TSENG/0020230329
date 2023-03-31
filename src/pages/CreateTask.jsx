@@ -1,92 +1,67 @@
 import { useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
-
-import {
-    addTask,
-    setAddedTaskSuccess,
-    setErrorOfAddTask,
-} from "../features/task/taskSlice"
+import { useAddTaskMutation } from "@/app/services/task"
 
 import {
     Breadcrumbs,
     Link,
     Box,
-    Toolbar,
-    Container,
     Typography,
     Button,
     FormGroup,
     TextField,
-    AppBar,
     Modal,
     CircularProgress,
 } from "@mui/material"
 
 function CreateTask() {
     const navigate = useNavigate()
-    const dispatch = useDispatch()
+
+    const [addTask, { isLoading: isAddTasksLoading, isSuccess: isAddSuccess }] =
+        useAddTaskMutation()
 
     const [newTaskTitle, setNewTaskTitle] = useState("")
     const [newTaskTitleError, setNewTaskTitleError] = useState("")
-
-    const {
-        isAddedTaskSuccess,
-        errorOfAddTask,
-        isLoading: isTaskLoading,
-    } = useSelector((state) => state.task)
+    const [isModalShow, setIsModalShow] = useState(false)
+    const [modalError, setModalError] = useState(null)
 
     useEffect(() => {
-        if (!isAddedTaskSuccess) return
+        if (!isAddSuccess) return
 
-        dispatch(setAddedTaskSuccess(false))
         navigate("/")
-    }, [isAddedTaskSuccess, dispatch])
+    }, [isAddSuccess])
+
+    function handleClose() {
+        setIsModalShow(false)
+        setModalError(null)
+    }
 
     function handleNewTaskTitle(event) {
         setNewTaskTitle(event.target.value)
     }
 
-    function addTaskItem(newTask) {
+    async function addTaskItem(newTask) {
         if (!newTask.title) return setNewTaskTitleError("此欄位不能為空")
 
-        dispatch(addTask({ ...newTask, complete: false }))
+        try {
+            await addTask([{ ...newTask, complete: false }]).unwrap()
+        } catch (error) {
+            setIsModalShow(true)
+            setModalError(error.status + " " + error.data.error)
+        }
     }
 
     return (
         <>
-            <AppBar
-                sx={{ paddingX: "24px", marginBottom: "24px" }}
-                position="static"
-            >
-                <Toolbar disableGutters>
-                    <Typography variant="h6" component="a" sx={{}}>
-                        Tasks APP
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-            <Container maxWidth="lg">
+            <Box>
                 {/* Error Modal */}
                 <Modal
-                    open={!!errorOfAddTask}
-                    onClose={() => {
-                        dispatch(setErrorOfAddTask(null))
-                    }}
+                    open={isModalShow}
+                    onClose={handleClose}
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
-                    <Box
-                        sx={{
-                            position: "absolute",
-                            top: "50%",
-                            left: "50%",
-                            transform: "translate(-50%, -50%)",
-                            width: 400,
-                            bgcolor: "#fff",
-                            boxShadow: 24,
-                            p: 4,
-                        }}
-                    >
+                    <Box>
                         <Typography
                             id="modal-modal-title"
                             variant="h6"
@@ -95,7 +70,7 @@ function CreateTask() {
                             新增 Task 失敗
                         </Typography>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            {errorOfAddTask}
+                            {modalError}
                         </Typography>
                     </Box>
                 </Modal>
@@ -119,7 +94,7 @@ function CreateTask() {
                             variant="outlined"
                             value={newTaskTitle}
                             onChange={handleNewTaskTitle}
-                            disabled={isTaskLoading}
+                            disabled={isAddTasksLoading}
                             sx={{ marginBottom: "12px" }}
                             error={!!newTaskTitleError}
                             helperText={newTaskTitleError.message}
@@ -128,10 +103,10 @@ function CreateTask() {
                             variant="contained"
                             sx={{ marginBottom: "12px" }}
                             onClick={() => addTaskItem({ title: newTaskTitle })}
-                            disabled={isTaskLoading}
+                            disabled={isAddTasksLoading}
                         >
                             新增任務
-                            {isTaskLoading && (
+                            {isAddTasksLoading && (
                                 <CircularProgress
                                     size={24}
                                     sx={{
@@ -150,13 +125,13 @@ function CreateTask() {
                         <Button
                             variant="outlined"
                             onClick={() => navigate("/")}
-                            disabled={isTaskLoading}
+                            disabled={isAddTasksLoading}
                         >
                             取消
                         </Button>
                     </FormGroup>
                 </Box>
-            </Container>
+            </Box>
         </>
     )
 }
